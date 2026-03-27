@@ -25,8 +25,43 @@ services:
     depends_on:
       - mongodb
       - redis
+  cart:
+    image: cart:v1
+    container_name: cart
+    depends_on:
+      - redis
+      - catalogue
+  shipping:
+    image: shipping:v1
+    container_name: shipping
+    depends_on:
+      - mysql
+      - cart
+  payment:
+    image: payment:v1
+    container_name: payment
+    depends_on:
+      - rabbitmq
+      - cart
+      - user
+  frontend:
+    image: frontend:v1
+    container_name: frontend
+    ports:
+    - "80:80"
+    depends_on:
+      - catalogue
+      - user
+      - cart
+      - shipping
+      - payment
 networks:
   default:
     driver: bridge
     name: roboshop
     external: false
+volumes:
+  mongodb:
+  redis:
+  mysql:
+  rabbitmq:
